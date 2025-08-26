@@ -3,8 +3,12 @@
 @use "base/mixins";
 @use "base/globales";
 @use "base/utilidades";
+@use "base/botones.scss";
 
 /** UI **/
 @use "layout/header";
 @use "layout/footer";
 @use "layout/navegacion";
+@use "layout/iconos";
+@use "layout/anuncios";
+@use "layout/contacto";
