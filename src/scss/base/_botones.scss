@@ -3,10 +3,16 @@
 
 .boton-amarillo {
   @include m.boton(v.$amarillo, block);
+  &:hover {
+    background-color: #b86b07; // amarillo más oscuro a mano
+  }
 }
 
 .boton-amarillo-block {
   @include m.boton(v.$amarillo, block);
+  &:hover {
+    background-color: #b86b07; // amarillo más oscuro a mano
+  }
 }
 
 .boton-verde {
