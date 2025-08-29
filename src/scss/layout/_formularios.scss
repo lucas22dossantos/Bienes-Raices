@@ -1,0 +1,99 @@
+@use "sass:color";
+@use "../base/variables" as v;
+
+.formulario {
+  p {
+    font-size: 1.4rem;
+    color: v.$grisOscuro;
+    margin: 2rem 0 1rem 0;
+  }
+
+  legend {
+    color: v.$grisOscuro;
+    font-size: 2rem;
+    font-weight: v.$bold;
+    margin-bottom: 1rem;
+    padding: 0 1rem;
+    border-left: 4px solid v.$verde; // resalta la sección
+  }
+
+  label {
+    display: block;
+    font-weight: v.$bold;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+    color: v.$grisOscuro;
+  }
+
+  input:not([type="submit"]),
+  textarea,
+  select {
+    padding: 1rem;
+    display: block;
+    width: 100%;
+    background: v.$blanco;
+    border: 1px solid v.$gris;
+    border-radius: 0.8rem;
+    margin-bottom: 2rem;
+    font-size: 1.4rem;
+    transition: all 0.3s ease;
+  }
+
+  input:not([type="submit"]):focus,
+  textarea:focus,
+  select:focus {
+    border-color: v.$verde;
+    box-shadow: 0 0 0 3px rgba(v.$verde, 0.2);
+    outline: none;
+  }
+
+  textarea {
+    min-height: 15rem;
+    resize: vertical;
+  }
+
+  .forma-contacto {
+    max-width: 30rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+
+    label {
+      margin: 0;
+      text-transform: none;
+      font-weight: normal;
+      color: v.$grisOscuro;
+    }
+  }
+
+  input[type="radio"] {
+    margin: 0 0.5rem 0 0;
+    width: auto;
+    accent-color: v.$verde; // moderno: cambia el color del radio button
+  }
+
+  // Botón enviar
+  .boton-verde {
+    display: inline-block;
+    background-color: v.$verde;
+    color: v.$blanco;
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 0.8rem;
+    font-size: 1.6rem;
+    font-weight: v.$bold;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+
+    &:hover {
+      background-color: color.adjust(v.$verde, $lightness: -10%);
+      transform: translateY(-2px);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+}
