@@ -3,7 +3,8 @@
 @use "base/mixins";
 @use "base/globales";
 @use "base/utilidades";
-@use "base/botones.scss";
+@use "base/botones";
+@use "base/darkMode";
 
 /** UI **/
 @use "layout/header";
