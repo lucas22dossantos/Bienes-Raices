@@ -1,8 +1,9 @@
-
 <?php 
-  $inicio = true;
-  include 'includes/templates/header.php'; 
+    require __DIR__ . '/includes/funciones.php';
+
+  incluirTemplates('header', $inicio = true);
 ?>
+
 
     <main class="contenedor seccion">
       <h1>Mas sobre nosotros</h1>
@@ -277,5 +278,10 @@
       </section>
     </div>
 
-     <?php include 'includes/templates/footer.php'; ?>
+    
     <script src="build/js/bundle.min.js"></script>
+
+
+      <?php
+       incluirTemplates('footer', $inicio = false);
+     ?>

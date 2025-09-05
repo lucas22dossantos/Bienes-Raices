@@ -1,5 +1,9 @@
-<?php include '../../includes/templates/header.php'; ?>
+<?php //include '../../includes/templates/header.php'; ?>
+<?php 
+    require __DIR__ . '../../../includes/funciones.php';
 
+  incluirTemplates('header', $inicio = false);
+?>
 
     <main class="contenedor seccion">
       <h1>Conose sobre nosotros</h1>
@@ -87,5 +91,8 @@
       </div>
     </section>
 
-     <?php include '../../includes/templates/footer.php'; ?>
     <script src="../../build/js/bundle.min.js"></script>
+
+        <?php
+       incluirTemplates('footer', $inicio = false);
+     ?>
