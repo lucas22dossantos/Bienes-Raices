@@ -1,7 +1,37 @@
 <?php
 
-require '../../includes/funciones.php';
-incluirTemplates('header',false);
+//base de datos
+    require '../../includes/config/database.php';
+    $db = conectarBD();
+
+    require '../../includes/funciones.php';
+    incluirTemplates('header',false);
+
+    if($_SERVER['REQUEST_METHOD'] === 'POST'){
+        echo '<pre> ';
+            var_dump($_POST);
+        echo '</pre> ';
+
+        $titulo = $_POST['titulo'];
+        $precio = $_POST['precio'];
+        $descripcion = $_POST['descripcion'];
+        $habitaciones = $_POST['habitaciones'];
+        $wc = $_POST['wc'];
+        $estacionamiento = $_POST['estacionamiento'];
+        $vendedorid = $_POST['vendedorid'];
+
+        //Insertamos en la base de datos
+
+        $query = "INSERT INTO propiedades (titulo, precio, descripcion, habitaciones, wc, estacionamiento, vendedores_id)
+        VALUES ('$titulo', '$precio', '$descripcion', '$habitaciones', '$wc', '$estacionamiento', '$vendedorid');"; 
+
+        $resultado = mysqli_query($db, $query);
+
+        if($resultado){
+            echo 'Insertado Correctamente';
+        }
+        
+    }
 
 ?>
 <main class="contenedor seccion">
@@ -9,34 +39,34 @@ incluirTemplates('header',false);
 
     <a href="/admin/" class="boton boton-verde">Volver</a>
 
-    <form action="" class="formulario">
+    <form action="/admin/propiedades/crear.php" method="POST" class="formulario">
         <fieldset>
             <legend>Informacion general</legend>
 
             <label for="titulo">Titulo:</label>
-            <input type="text" id="titulo" placeholder="Titulo propiedad">
+            <input type="text" id="titulo" name="titulo" placeholder="Titulo propiedad">
 
             <label for="precio">Precio:</label>
-            <input type="number" id="precio" placeholder="Precio propiedad">
+            <input type="number" id="precio" name="precio" placeholder="Precio propiedad">
 
             <label for="imagen">Imagen:</label>
             <input type="file" id="imagen" accept="image/jpeg">
 
             <label for="descripcion">Descripción:</label>
-            <textarea id="descripcion"></textarea>
+            <textarea id="descripcion" name="descripcion"></textarea>
  
         </fieldset>
         <fieldset>
             <legend>Informacion Habitaciones</legend>
 
             <label for="habitaciones">Habitaciones:</label>
-            <input type="number" id="habitaciones" placeholder="Ej: 3" min="1" max="9">
+            <input type="number" id="habitaciones" name="habitaciones" placeholder="Ej: 3" min="1" max="9">
 
             <label for="wc">Baños:</label>
-            <input type="number" id="wc" placeholder="Ej: 3" min="1" max="9">
+            <input type="number" id="wc" name="wc" placeholder="Ej: 3" min="1" max="9">
 
-            <label for="estacionamientos">Estacionamientos:</label>
-            <input type="number" id="estacionamientos" placeholder="Ej: 2" min="1" max="9">
+            <label for="estacionamiento">Estacionamientos:</label>
+            <input type="number" id="estacionamiento" name="estacionamiento" placeholder="Ej: 2" min="1" max="9">
 
  
         </fieldset>
@@ -44,7 +74,7 @@ incluirTemplates('header',false);
          <fieldset>
             <legend>Vendedor</legend>
 
-            <select name="" id="">
+            <select name="vendedorid" id="vendedorid">
                 <option value="1">Juan</option>
                 <option value="2">Lucas</option>
             </select>
