@@ -27,13 +27,23 @@
         
 
         $titulo = $_POST['titulo'];
-        $precio = $_POST['precio'];
         $descripcion = $_POST['descripcion'];
-        $habitaciones = $_POST['habitaciones'];
-        $wc = $_POST['wc'];
-        $estacionamiento = $_POST['estacionamiento'];
-        $vendedorid = $_POST['vendedorid'];
-        $creado = date('y/m/d');
+
+        // $titulo = mysqli_real_escape_string($db, $_POST['titulo']);
+        // $precio = mysqli_real_escape_string($db, $_POST['precio']);
+        // $descripcion = mysqli_real_escape_string($db, $_POST['descripcion']);
+        // $habitaciones = mysqli_real_escape_string($db, $_POST['habitaciones']);
+        // $wc = mysqli_real_escape_string($db, $_POST['wc']);
+        // $estacionamiento = mysqli_real_escape_string($db, $_POST['estacionamiento']);
+        // $vendedorid = mysqli_real_escape_string($db, $_POST['vendedorid']);
+        $creado = date('Y-m-d');
+
+        $precio = filter_var($_POST['precio'], FILTER_VALIDATE_INT);
+        $habitaciones = filter_var($_POST['habitaciones'], FILTER_VALIDATE_INT);
+        $wc = filter_var($_POST['wc'], FILTER_VALIDATE_INT);
+        $estacionamiento = filter_var($_POST['estacionamiento'], FILTER_VALIDATE_INT);
+        $vendedorid = filter_var($_POST['vendedorid'], FILTER_VALIDATE_INT);
+
 
         if(!$titulo){
             $errores[] = "El campo titulo es obligatorio";
@@ -64,20 +74,25 @@
 
         //revisamos que el array de errores este vacio
         if(empty($errores)){
-            
-            //Insertamos en la base de datos
-            $query = "INSERT INTO propiedades (titulo, precio, descripcion, habitaciones, wc, estacionamiento, creado, vendedores_id)
-            VALUES ('$titulo', '$precio', '$descripcion', '$habitaciones', '$wc', '$estacionamiento', '$creado', '$vendedorid');"; 
 
-            $resultadoInsert  = mysqli_query($db, $query);
- 
-                
-             if($resultadoInsert){
+            //Insertamos en la base de datos
+$stmt = $db->prepare("INSERT INTO propiedades 
+    (titulo, precio, descripcion, habitaciones, wc, estacionamiento, creado, vendedores_id)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+$stmt->bind_param("sisiiisi", $titulo, $precio, $descripcion, $habitaciones, $wc, $estacionamiento, $creado, $vendedorid);
+$stmt->execute();
+
+
+            // $query = "INSERT INTO propiedades (titulo, precio, descripcion, habitaciones, wc, estacionamiento, creado, vendedores_id)
+            // VALUES ('$titulo', '$precio', '$descripcion', '$habitaciones', '$wc', '$estacionamiento', '$creado', '$vendedorid');"; 
+
+            // $resultadoInsert  = mysqli_query($db, $query);
+  
+            if($stmt->affected_rows > 0){
                 //rediccionar al usuario
                 header('Location: /admin');
                 exit;
             }
-
         }
     }
 
@@ -102,7 +117,7 @@
             <legend>Informacion general</legend>
 
             <label for="titulo">Titulo:</label>
-            <input type="text" id="titulo" name="titulo" placeholder="Titulo propiedad" value="<?php echo $titulo; ?>">
+            <input type="text" id="titulo" name="titulo" placeholder="Titulo propiedad" value="<?php echo htmlspecialchars($titulo); ?>">
 
             <label for="precio">Precio:</label>
             <input type="number" id="precio" name="precio" placeholder="Precio propiedad" value="<?php echo $precio; ?>">
@@ -111,7 +126,7 @@
             <input type="file" id="imagen" name="imagen" accept="image/jpeg">
 
             <label for="descripcion">Descripción:</label>
-            <textarea id="descripcion" name="descripcion"><?php echo $descripcion; ?></textarea>
+            <textarea id="descripcion" name="descripcion"><?php echo htmlspecialchars($descripcion); ?></textarea>
  
         </fieldset>
         <fieldset>
