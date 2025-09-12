@@ -44,7 +44,9 @@
         $estacionamiento = filter_var($_POST['estacionamiento'], FILTER_VALIDATE_INT);
         $vendedorid = filter_var($_POST['vendedorid'], FILTER_VALIDATE_INT);
 
+        $imagen = $_FILES['imagen'];
 
+       
         if(!$titulo){
             $errores[] = "El campo titulo es obligatorio";
         }
@@ -66,21 +68,54 @@
         if(!$vendedorid){
             $errores[] = "El campo vendedor es obligatorio";
         }
+        if(!$imagen['name'] || $imagen['error']){
+            $errores[] = "el campo de imagenes no pude estar vacia";
+        }
+
+        // validamos por tamaño las imagenes(100kb máximo)
+        $medida = 1024 * 1024; // 1 MB
+        if($imagen['size'] > $medida){
+            $errores[] = "la imagen es muy pesada";
+        }
 
         // echo '<pre> ';
         //     var_dump($_POST);
         // echo '</pre> ';
+
+        echo '<pre> ';
+            var_dump($_FILES);
+        echo '</pre> ';
         // exit;
 
         //revisamos que el array de errores este vacio
         if(empty($errores)){
 
+            /** Subida de archivos **/ 
+
+            // creamos carpetas
+            $carpetaImagenes = "../../imagenes/";
+            if(!is_dir($carpetaImagenes)){ //pregunta si no existe la carpeta ingresara y creara la carpeta.
+                mkdir($carpetaImagenes);
+            }
+
+            //generar un nombre unico
+            $nombreImagenes = md5(uniqid(rand(rand(), true))) . '.jpg'  ;
+            var_dump($nombreImagenes);
+
+
+            // Subir la imagen
+            move_uploaded_file($imagen['tmp_name'], $carpetaImagenes . $nombreImagenes);
+
+            // exit;
+
+
+
             //Insertamos en la base de datos
-$stmt = $db->prepare("INSERT INTO propiedades 
-    (titulo, precio, descripcion, habitaciones, wc, estacionamiento, creado, vendedores_id)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-$stmt->bind_param("sisiiisi", $titulo, $precio, $descripcion, $habitaciones, $wc, $estacionamiento, $creado, $vendedorid);
-$stmt->execute();
+            $stmt = $db->prepare("INSERT INTO propiedades 
+                (titulo, precio, imagen, descripcion, habitaciones, wc, estacionamiento, creado, vendedores_id)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param("sissiiisi", $titulo, $precio, $nombreImagenes, $descripcion, $habitaciones, $wc, $estacionamiento, $creado, $vendedorid);
+            $stmt->execute();
 
 
             // $query = "INSERT INTO propiedades (titulo, precio, descripcion, habitaciones, wc, estacionamiento, creado, vendedores_id)
@@ -112,7 +147,7 @@ $stmt->execute();
 
         
 
-    <form action="/admin/propiedades/crear.php" method="POST" class="formulario">
+    <form action="/admin/propiedades/crear.php" method="POST" class="formulario" enctype="multipart/form-data">
         <fieldset>
             <legend>Informacion general</legend>
 
@@ -123,11 +158,11 @@ $stmt->execute();
             <input type="number" id="precio" name="precio" placeholder="Precio propiedad" value="<?php echo $precio; ?>">
 
             <label for="imagen">Imagen:</label>
-            <input type="file" id="imagen" name="imagen" accept="image/jpeg">
+            <input type="file" id="imagen" name="imagen" accept="image/jpeg, image/png">
 
             <label for="descripcion">Descripción:</label>
             <textarea id="descripcion" name="descripcion"><?php echo htmlspecialchars($descripcion); ?></textarea>
- 
+
         </fieldset>
         <fieldset>
             <legend>Informacion Habitaciones</legend>
