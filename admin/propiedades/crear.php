@@ -125,7 +125,7 @@
   
             if($stmt->affected_rows > 0){
                 //rediccionar al usuario
-                header('Location: /admin');
+                header('Location: /admin?resultado=1');
                 exit;
             }
         }
