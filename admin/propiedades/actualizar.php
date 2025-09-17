@@ -40,16 +40,10 @@ if(!$id){
     if($_SERVER['REQUEST_METHOD'] === 'POST'){
         
 
-        // echo '<pre>';
-        // var_dump($_POST);
-        // echo '</pre>';
-
-        // exit;
-
         $titulo = $_POST['titulo'];
         $descripcion = $_POST['descripcion'];
         $creado = date('Y-m-d');
-        $precio = filter_var($_POST['precio'], FILTER_VALIDATE_INT);
+        $precio = filter_var($_POST['precio'], FILTER_VALIDATE_FLOAT);
         $habitaciones = filter_var($_POST['habitaciones'], FILTER_VALIDATE_INT);
         $wc = filter_var($_POST['wc'], FILTER_VALIDATE_INT);
         $estacionamiento = filter_var($_POST['estacionamiento'], FILTER_VALIDATE_INT);
@@ -61,9 +55,12 @@ if(!$id){
         if(!$titulo){
             $errores[] = "El campo titulo es obligatorio";
         }
+
         if(!$precio){
             $errores[] = "El campo precio es obligatorio";
         }
+        
+
         if(!$descripcion || strlen($descripcion) < 50){
             $errores[] = "El campo descripcion es obligatorio y debe tener al menos 50 caracteres";
         }
@@ -110,7 +107,7 @@ if(!$id){
                 
                 //generar un nombre unico
                 $nombreImagenes = md5(uniqid(rand(rand(), true))) . '.jpg'  ;
-                var_dump($nombreImagenes);
+                
             } else {
                 $nombreImagenes = $imagenProp; // mantener la imagen anterior
             }
@@ -130,11 +127,19 @@ if(!$id){
                 creado = ?, 
                 vendedores_id = ? 
                 WHERE id = ?");
-            $stmt->bind_param("sissiiisii", $titulo, $precio, $nombreImagenes, $descripcion, $habitaciones, $wc, $estacionamiento, $creado, $vendedorid, $id);
+            $stmt->bind_param("sissiiisii", 
+                $titulo, 
+                $precio, 
+                $nombreImagenes, 
+                $descripcion, 
+                $habitaciones, 
+                $wc, 
+                $estacionamiento, 
+                $creado, 
+                $vendedorid, 
+                $id
+            );
             $stmt->execute();
-
-            // echo $stmt;
-
 
             if($stmt->affected_rows > 0){
                 //rediccionar al usuario
