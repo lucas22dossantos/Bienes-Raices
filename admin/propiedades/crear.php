@@ -78,14 +78,6 @@
             $errores[] = "la imagen es muy pesada";
         }
 
-        // echo '<pre> ';
-        //     var_dump($_POST);
-        // echo '</pre> ';
-
-        echo '<pre> ';
-            var_dump($_FILES);
-        echo '</pre> ';
-        // exit;
 
         //revisamos que el array de errores este vacio
         if(empty($errores)){

@@ -51,7 +51,6 @@ if(!$id){
 
         $imagen = $_FILES['imagen'];
 
-       
         if(!$titulo){
             $errores[] = "El campo titulo es obligatorio";
         }
@@ -60,7 +59,6 @@ if(!$id){
             $errores[] = "El campo precio es obligatorio";
         }
         
-
         if(!$descripcion || strlen($descripcion) < 50){
             $errores[] = "El campo descripcion es obligatorio y debe tener al menos 50 caracteres";
         }
@@ -77,7 +75,6 @@ if(!$id){
             $errores[] = "El campo vendedor es obligatorio";
         }
    
-
         // validamos por tamaño las imagenes(100kb máximo)
         $medida = 1024 * 1024; // 1 MB
         if($imagen['size'] > $medida){

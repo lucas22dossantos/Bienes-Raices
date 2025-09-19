@@ -1,20 +1,42 @@
-<?php //include '../../includes/templates/header.php'; ?>
 <?php 
-    require __DIR__ . '../../../includes/funciones.php';
+  require __DIR__ . '../../../includes/funciones.php';
+
+  //recibimos el id y validamos
+  $id = $_GET['id'];
+  $id = filter_var($id, FILTER_VALIDATE_INT);
+
+  if(!$id){
+      header('Location:/admin');
+  }
+
+  //base de datos
+  require '../../includes/config/database.php';
+  $db = conectarBD();
+
+  //Consulta traer los datos de propiedades
+  $consulta = "SELECT * FROM propiedades WHERE id = " . $id;
+  $resultado = mysqli_query($db, $consulta);
+  
+  // Verificar si la propiedad existe
+  if(mysqli_num_rows($resultado) === 0) {
+      header('Location: /admin');
+      exit;
+  }
+  
+  $propiedad = mysqli_fetch_assoc($resultado);
 
   incluirTemplates('header', $inicio = false);
 ?>
 
     <main class="contenedor seccion contenido-centrado">
-      <h1>Casa en venta frente al bosque</h1>
+      <h1><?php echo $propiedad['titulo']; ?></h1>
+      
       <picture>
-        <source srcset="../../build/img/destacada.webp" type="img/webp" />
-        <source srcset="../../build/img/destacada.jpg" type="img/jpg" />
-        <img loading="lazy" src="../../build/img/destacada.jpg" alt="Anuncio" />
+        <img loading="lazy" src="/imagenes/<?php echo $propiedad['imagen']; ?>" alt="Anuncio">
       </picture>
 
       <div class="resumen-propiedad">
-        <p class="precio">$3,000,000</p>
+        <p class="precio">$<?php echo number_format($propiedad['precio']); ?></p>
         <ul class="icono-caracteristicas">
           <li>
             <img
@@ -23,7 +45,7 @@
               src="../../build/img/icono_wc.svg"
               alt="Icono WC"
             />
-            <p>3</p>
+            <p><?php echo $propiedad['wc']; ?></p>
           </li>
           <li>
             <img
@@ -32,7 +54,7 @@
               src="../../build/img/icono_estacionamiento.svg"
               alt="Icono estacionamiento"
             />
-            <p>3</p>
+            <p><?php echo $propiedad['estacionamiento']; ?></p>
           </li>
           <li>
             <img
@@ -41,32 +63,16 @@
               src="../../build/img/icono_dormitorio.svg"
               alt="Icono dormitorio"
             />
-            <p>4</p>
+            <p><?php echo $propiedad['habitaciones']; ?></p>
           </li>
         </ul>
 
-        <p>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae
-          provident, velit aliquid corporis ducimus, quam numquam fuga
-          consectetur autem eum doloribus laudantium, minus facere blanditiis
-          ut! Perferendis facere incidunt atque. Lorem ipsum dolor, sit amet
-          consectetur adipisicing elit. Perferendis deserunt sapiente
-          dignissimos explicabo veritatis, quaerat minus nobis quis blanditiis
-          doloremque rerum accusamus esse quam dolore error nisi veniam unde
-          sequi? Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae
-          provident, velit aliquid corporis ducimus, quam numquam fuga
-          consectetur autem eum doloribus laudantium, minus facere blanditiis
-          ut! Perferendis facere incidunt atque. Lorem ipsum dolor, sit amet
-          consectetur adipisicing elit. Perferendis deserunt sapiente
-          dignissimos explicabo veritatis, quaerat minus nobis quis blanditiis
-          doloremque rerum accusamus esse quam dolore error nisi veniam unde
-          sequi?
-        </p>
+        <p><?php echo $propiedad['descripcion']; ?></p>
       </div>
     </main>
 
     <script src="../../build/js/bundle.min.js"></script>
 
-    <?php
-       incluirTemplates('footer', $inicio = false);
-     ?>
+<?php
+   incluirTemplates('footer', $inicio = false);
+?>
