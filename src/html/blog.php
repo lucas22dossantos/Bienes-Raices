@@ -1,4 +1,4 @@
-<?php //include '../../includes/templates/header.php'; ?>
+
 <?php 
     require __DIR__ . '../../../includes/funciones.php';
 
