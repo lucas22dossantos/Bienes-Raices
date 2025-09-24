@@ -1,3 +1,9 @@
+<?php 
+
+$auth = $_SESSION['login'] ?? null;
+
+?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -29,6 +35,9 @@
               <a href="/src/html/anuncios.php">Anuncios</a>
               <a href="/src/html/blog.php">Blog</a>
               <a href="/src/html/contacto.php">Contacto</a>
+              <?php if($auth): ?>
+                  <a href="/src/html/cerrar-sesion.php">Cerrar Sesión</a>
+              <?php endif ?>
             </nav>
           </div>
         </div>
@@ -36,6 +45,3 @@
         <?php echo $inicio ? '<h1>Venta de casas y departamento exclusivos de lujo</h1>' : ''; ?>
       </div>
     </header>
-
-
-    

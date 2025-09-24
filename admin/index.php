@@ -1,4 +1,12 @@
 <?php
+require '../includes/funciones.php';
+$auth = estaAutenticada();
+
+if(!$auth){
+    header('Location: ../src/html/login.php'); // o donde tengas el login
+    exit;
+}
+
 
     // importar la conexion
     require '../includes/config/database.php';
@@ -39,7 +47,6 @@
     }
 
     // incluye un template
-    require '../includes/funciones.php';
     incluirTemplates('header',false);
 
 ?>

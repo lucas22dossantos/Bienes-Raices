@@ -1,10 +1,17 @@
 <?php
+require '../../includes/funciones.php';
+$auth = estaAutenticada();
+
+if(!$auth){
+    header('Location: ../../src/html/login.php'); // o donde tengas el login
+    exit;
+}
+
 
 //base de datos
     require '../../includes/config/database.php';
     $db = conectarBD();
 
-    require '../../includes/funciones.php';
     incluirTemplates('header',false);
 
     //consulta para obtener a todos los vendedores

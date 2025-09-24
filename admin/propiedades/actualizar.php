@@ -1,4 +1,12 @@
 <?php
+require '../../includes/funciones.php';
+$auth = estaAutenticada();
+
+if(!$auth){
+    header('Location: ../../src/html/login.php'); // o donde tengas el login
+    exit;
+}
+
 
 //recibimos el id y validamos
 $id = $_GET['id'];
@@ -12,7 +20,6 @@ if(!$id){
     require '../../includes/config/database.php';
     $db = conectarBD();
 
-    require '../../includes/funciones.php';
     incluirTemplates('header',false);
 
     //Consulta traer los datos de propiedades

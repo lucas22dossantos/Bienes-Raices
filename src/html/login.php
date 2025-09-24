@@ -1,4 +1,5 @@
 <?php 
+session_start();
 
 //conexion a la bd
     require '../../includes/config/database.php';
@@ -31,7 +32,13 @@
                 $auth = password_verify($password, $usuario['contrasena']);
 
                 if($auth){
-                    // el usuario esta autinticado
+                
+                    // llenar el arreglo de la sesión
+                    $_SESSION['usuario'] = $usuario['correo'];
+                    $_SESSION['login'] = true;
+
+                    header('Location: ../../admin/');
+
                 }else{
                     $errores[] = "La contraseña es incorrecta";
                 }
