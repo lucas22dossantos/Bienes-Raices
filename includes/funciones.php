@@ -19,3 +19,11 @@ function estaAutenticada(): bool
 
     return $_SESSION['login'] ?? false;
 }
+
+function debuguer($variable)
+{
+    echo '<pre>';
+    var_dump($variable);
+    echo '</pre>';
+    exit;
+}
