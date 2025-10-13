@@ -12,7 +12,7 @@ class Propiedad
     public $descripcion;
     public $habitaciones;
     public $wc;
-    public $estacinamiento;
+    public $estacionamiento;
     public $creador;
     public $vendedorId;
 
@@ -24,8 +24,13 @@ class Propiedad
         $this->descripcion = $args['descripcion'] ?? '';
         $this->habitaciones = $args['habitaciones'] ?? '';
         $this->wc = $args['wc'] ?? '';
-        $this->estacinamiento = $args['estacinamiento'] ?? '';
-        $this->creador = $args['creador'] ?? '';
-        $this->vendedorId = $args['vendedor_id'] ?? '';
+        $this->estacionamiento = $args['estacionamiento'] ?? '';
+        $this->creador = date('y/m/d');
+        $this->vendedorId = $args['vendedores_id'] ?? '';
+    }
+
+    public function guardar()
+    {
+        echo "Guardando en la base de datos";
     }
 }

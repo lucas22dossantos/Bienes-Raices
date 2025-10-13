@@ -4,8 +4,6 @@ $auth = estaAutenticada();
 
 use App\Propiedad;
 
-$propiedad = new Propiedad;
-
 // funcion de autenticacion
 estaAutenticada();
 
@@ -32,17 +30,12 @@ $vendedorid = '';
 //ejecuta el codigo despues que el usuario envia el furmulario.
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
+    $propiedad = new Propiedad($_POST);
+    $propiedad->guardar();
 
     $titulo = $_POST['titulo'];
     $descripcion = $_POST['descripcion'];
 
-    // $titulo = mysqli_real_escape_string($db, $_POST['titulo']);
-    // $precio = mysqli_real_escape_string($db, $_POST['precio']);
-    // $descripcion = mysqli_real_escape_string($db, $_POST['descripcion']);
-    // $habitaciones = mysqli_real_escape_string($db, $_POST['habitaciones']);
-    // $wc = mysqli_real_escape_string($db, $_POST['wc']);
-    // $estacionamiento = mysqli_real_escape_string($db, $_POST['estacionamiento']);
-    // $vendedorid = mysqli_real_escape_string($db, $_POST['vendedorid']);
     $creado = date('Y-m-d');
 
     $precio = filter_var($_POST['precio'], FILTER_VALIDATE_INT);
@@ -116,12 +109,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->bind_param("sissiiisi", $titulo, $precio, $nombreImagenes, $descripcion, $habitaciones, $wc, $estacionamiento, $creado, $vendedorid);
         $stmt->execute();
 
-
-        // $query = "INSERT INTO propiedades (titulo, precio, descripcion, habitaciones, wc, estacionamiento, creado, vendedores_id)
-        // VALUES ('$titulo', '$precio', '$descripcion', '$habitaciones', '$wc', '$estacionamiento', '$creado', '$vendedorid');"; 
-
-        // $resultadoInsert  = mysqli_query($db, $query);
-
         if ($stmt->affected_rows > 0) {
             //rediccionar al usuario
             header('Location: /admin?resultado=1');
@@ -181,7 +168,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <fieldset>
             <legend>Vendedor</legend>
 
-            <select name="vendedorid" id="vendedorid">
+            <select name="vendedores_id" id="vendedores_id">
                 <option value="">-- Seleccione --</option>
                 <?php while ($vendedor = mysqli_fetch_assoc($resultadoVendedores)) : ?>
                     <option <?php echo $vendedorid == $vendedor['id'] ? 'selected' : '' ?> value="<?php echo $vendedor['id'] ?>"> <?php echo $vendedor['nombre'] . " " . $vendedor["apellido"] ?> </option>
