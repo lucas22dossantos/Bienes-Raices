@@ -31,7 +31,6 @@ $vendedorid = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $propiedad = new Propiedad($_POST);
-    $propiedad->guardar();
 
     $titulo = $_POST['titulo'];
     $descripcion = $_POST['descripcion'];
@@ -42,7 +41,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $habitaciones = filter_var($_POST['habitaciones'], FILTER_VALIDATE_INT);
     $wc = filter_var($_POST['wc'], FILTER_VALIDATE_INT);
     $estacionamiento = filter_var($_POST['estacionamiento'], FILTER_VALIDATE_INT);
-    $vendedorid = filter_var($_POST['vendedorid'], FILTER_VALIDATE_INT);
+    $vendedorid = filter_var($_POST['vendedores_id'], FILTER_VALIDATE_INT);
+
 
     $imagen = $_FILES['imagen'];
 
@@ -78,7 +78,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errores[] = "la imagen es muy pesada";
     }
 
-
     //revisamos que el array de errores este vacio
     if (empty($errores)) {
 
@@ -87,32 +86,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // creamos carpetas
         $carpetaImagenes = "../../imagenes/";
         if (!is_dir($carpetaImagenes)) { //pregunta si no existe la carpeta ingresara y creara la carpeta.
-            mkdir($carpetaImagenes);
+            mkdir($carpetaImagenes, 0777, true); // 0777 para permisos (opcional, pero útil en algunos servidores)
         }
 
         //generar un nombre unico
-        $nombreImagenes = md5(uniqid(rand(rand(), true))) . '.jpg';
-        var_dump($nombreImagenes);
-
+        $nombreImagenes = md5(uniqid(rand(), true)) . '.jpg';
 
         // Subir la imagen
-        move_uploaded_file($imagen['tmp_name'], $carpetaImagenes . $nombreImagenes);
+        if (move_uploaded_file($imagen['tmp_name'], $carpetaImagenes . $nombreImagenes)) {
 
-        // exit;
+            //Asignamos el nombre de la imagen al objeto Propiedad
+            $propiedad->imagen = $nombreImagenes;
 
-
-
-        //Insertamos en la base de datos
-        $stmt = $db->prepare("INSERT INTO propiedades 
-                (titulo, precio, imagen, descripcion, habitaciones, wc, estacionamiento, creado, vendedores_id)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("sissiiisi", $titulo, $precio, $nombreImagenes, $descripcion, $habitaciones, $wc, $estacionamiento, $creado, $vendedorid);
-        $stmt->execute();
-
-        if ($stmt->affected_rows > 0) {
-            //rediccionar al usuario
-            header('Location: /admin?resultado=1');
-            exit;
+            // Guardar en la base de datos
+            if ($propiedad->guardar($db)) {
+                // Redirigir al usuario
+                header('Location: /admin?resultado=1');
+                exit;
+            } else {
+                // Si falla el guardado en BD, eliminamos la imagen subida (limpieza)
+                unlink($carpetaImagenes . $nombreImagenes);
+                $errores[] = "Hubo un error al guardar la propiedad en la base de datos.";
+            }
+        } else {
+            $errores[] = "No se pudo subir la imagen. Verifica los permisos de la carpeta 'imagenes'.";
         }
     }
 }

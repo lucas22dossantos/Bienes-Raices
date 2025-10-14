@@ -20,7 +20,7 @@ function estaAutenticada(): bool
     return $_SESSION['login'] ?? false;
 }
 
-function debuguer($variable)
+function debuguear($variable)
 {
     echo '<pre>';
     var_dump($variable);

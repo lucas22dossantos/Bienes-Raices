@@ -5,6 +5,9 @@ namespace App;
 class Propiedad
 {
 
+    // base de datos
+    protected static $db;
+
     public $id;
     public $titulo;
     public $precio;
@@ -13,8 +16,8 @@ class Propiedad
     public $habitaciones;
     public $wc;
     public $estacionamiento;
-    public $creador;
-    public $vendedorId;
+    public $creado;
+    public $vendedorid;
 
     public function __construct($args = [])
     {
@@ -25,12 +28,38 @@ class Propiedad
         $this->habitaciones = $args['habitaciones'] ?? '';
         $this->wc = $args['wc'] ?? '';
         $this->estacionamiento = $args['estacionamiento'] ?? '';
-        $this->creador = date('y/m/d');
-        $this->vendedorId = $args['vendedores_id'] ?? '';
+        $this->creado = date('y/m/d');
+        $this->vendedorid = $args['vendedores_id'] ?? '';
     }
 
-    public function guardar()
+    // Método guardar
+    public function guardar($db)
     {
-        echo "Guardando en la base de datos";
+        $stmt = $db->prepare("INSERT INTO propiedades 
+            (titulo, precio, imagen, descripcion, habitaciones, wc, estacionamiento, creado, vendedores_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+
+        $stmt->bind_param(
+            "sissiiisi",
+            $this->titulo,
+            $this->precio,
+            $this->imagen,
+            $this->descripcion,
+            $this->habitaciones,
+            $this->wc,
+            $this->estacionamiento,
+            $this->creado,
+            $this->vendedorid
+        );
+
+        $stmt->execute();
+
+        return $stmt->affected_rows > 0;
+    }
+
+    //definir la conexión a la base de datos
+    public static function setDB($database)
+    {
+        self::$db = $database;
     }
 }

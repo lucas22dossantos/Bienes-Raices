@@ -16,6 +16,7 @@ if (!$id) {
 //base de datos
 $db = conectarBD();
 
+
 incluirTemplates('header', false);
 
 //Consulta traer los datos de propiedades
