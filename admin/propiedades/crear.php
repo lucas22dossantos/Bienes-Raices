@@ -31,19 +31,14 @@ $vendedorid = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $propiedad = new Propiedad($_POST);
-
     $titulo = $_POST['titulo'];
     $descripcion = $_POST['descripcion'];
-
     $creado = date('Y-m-d');
-
     $precio = filter_var($_POST['precio'], FILTER_VALIDATE_INT);
     $habitaciones = filter_var($_POST['habitaciones'], FILTER_VALIDATE_INT);
     $wc = filter_var($_POST['wc'], FILTER_VALIDATE_INT);
     $estacionamiento = filter_var($_POST['estacionamiento'], FILTER_VALIDATE_INT);
     $vendedorid = filter_var($_POST['vendedores_id'], FILTER_VALIDATE_INT);
-
-
     $imagen = $_FILES['imagen'];
 
 

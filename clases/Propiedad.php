@@ -7,6 +7,7 @@ class Propiedad
 
     // base de datos
     protected static $db;
+    protected static $columnasDB = ['id', 'titulo', 'precio', 'imagen', 'descripcion', 'habitaciones', 'wc', 'estacionamiento', 'creado', 'vendedorid'];
 
     public $id;
     public $titulo;
@@ -18,6 +19,12 @@ class Propiedad
     public $estacionamiento;
     public $creado;
     public $vendedorid;
+
+    //definir la conexión a la base de datos
+    public static function setDB($database)
+    {
+        self::$db = $database;
+    }
 
     public function __construct($args = [])
     {
@@ -35,6 +42,10 @@ class Propiedad
     // Método guardar
     public function guardar($db)
     {
+
+        //sanitizar los datos
+        $atributos = $this->sanitizarDatos();
+
         $stmt = $db->prepare("INSERT INTO propiedades 
             (titulo, precio, imagen, descripcion, habitaciones, wc, estacionamiento, creado, vendedores_id)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
@@ -57,9 +68,23 @@ class Propiedad
         return $stmt->affected_rows > 0;
     }
 
-    //definir la conexión a la base de datos
-    public static function setDB($database)
+    public function atributos()
     {
-        self::$db = $database;
+        $atributos = [];
+        foreach (self::$columnasDB as $columna) {
+            if ($columna === 'id') continue;
+            $atributos[$columna] = $this->$columna;
+        }
+        return $atributos;
+    }
+
+    public function sanitizarDatos()
+    {
+        $atributos = $this->atributos();
+        $sanitizado = [];
+        foreach ($atributos as $key => $value) {
+            $sanitizado[$key] = self::$db->real_escape_string($value);
+        }
+        return $sanitizado;
     }
 }
