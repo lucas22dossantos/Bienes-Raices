@@ -9,6 +9,9 @@ class Propiedad
     protected static $db;
     protected static $columnasDB = ['id', 'titulo', 'precio', 'imagen', 'descripcion', 'habitaciones', 'wc', 'estacionamiento', 'creado', 'vendedorid'];
 
+    // errores
+    protected static $errores = [];
+
     public $id;
     public $titulo;
     public $precio;
@@ -40,13 +43,13 @@ class Propiedad
     }
 
     // Método guardar
-    public function guardar($db)
+    public function guardar()
     {
 
         //sanitizar los datos
         $atributos = $this->sanitizarDatos();
 
-        $stmt = $db->prepare("INSERT INTO propiedades 
+        $stmt = self::$db->prepare("INSERT INTO propiedades 
             (titulo, precio, imagen, descripcion, habitaciones, wc, estacionamiento, creado, vendedores_id)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
@@ -86,5 +89,51 @@ class Propiedad
             $sanitizado[$key] = self::$db->real_escape_string($value);
         }
         return $sanitizado;
+    }
+
+    // validacion
+    public static function getErrores()
+    {
+        return self::$errores;
+    }
+
+
+    public function validar()
+    {
+        if (!$this->titulo) {
+            self::$errores[] = "El campo titulo es obligatorio";
+        }
+        if (!$this->precio) {
+            self::$errores[] = "El campo precio es obligatorio";
+        }
+        if (!$this->descripcion || strlen($this->descripcion) < 50) {
+            self::$errores[] = "El campo descripcion es obligatorio y debe tener al menos 50 caracteres";
+        }
+        if (!$this->habitaciones) {
+            self::$errores[] = "El campo habitaciones es obligatorio";
+        }
+        if (!$this->wc) {
+            self::$errores[] = "El campo baños es obligatorio";
+        }
+        if (!$this->estacionamiento) {
+            self::$errores[] = "El campo estacionamiento es obligatorio";
+        }
+        if (!$this->vendedorid) {
+            self::$errores[] = "El campo vendedor es obligatorio";
+        }
+        if (is_array($this->imagen)) {
+            if (!$this->imagen['name'] || $this->imagen['error']) {
+                self::$errores[] = "El campo de imagen no puede estar vacío";
+            }
+
+            $medida = 1024 * 1024; // 1 MB
+            if ($this->imagen['size'] > $medida) {
+                self::$errores[] = "La imagen es muy pesada";
+            }
+        } else {
+            self::$errores[] = "El campo de imagen no puede estar vacío";
+        }
+
+        return self::$errores;
     }
 }

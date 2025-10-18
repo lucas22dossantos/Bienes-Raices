@@ -17,7 +17,9 @@ $consulta = "SELECT * FROM vendedores;";
 $resultadoVendedores =  mysqli_query($db, $consulta);
 
 //arreglo con mensajes de error
-$errores = [];
+$errores = Propiedad::getErrores();
+
+// debuguear($errores);
 
 $titulo = '';
 $precio = '';
@@ -31,50 +33,57 @@ $vendedorid = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $propiedad = new Propiedad($_POST);
-    $titulo = $_POST['titulo'];
-    $descripcion = $_POST['descripcion'];
-    $creado = date('Y-m-d');
-    $precio = filter_var($_POST['precio'], FILTER_VALIDATE_INT);
-    $habitaciones = filter_var($_POST['habitaciones'], FILTER_VALIDATE_INT);
-    $wc = filter_var($_POST['wc'], FILTER_VALIDATE_INT);
-    $estacionamiento = filter_var($_POST['estacionamiento'], FILTER_VALIDATE_INT);
-    $vendedorid = filter_var($_POST['vendedores_id'], FILTER_VALIDATE_INT);
-    $imagen = $_FILES['imagen'];
+    $propiedad->imagen = $_FILES['imagen'];
+    $errores = $propiedad->validar();
 
 
-    if (!$titulo) {
-        $errores[] = "El campo titulo es obligatorio";
-    }
-    if (!$precio) {
-        $errores[] = "El campo precio es obligatorio";
-    }
-    if (!$descripcion || strlen($descripcion) < 50) {
-        $errores[] = "El campo descripcion es obligatorio y debe tener al menos 50 caracteres";
-    }
-    if (!$habitaciones) {
-        $errores[] = "El campo habitaciones es obligatorio";
-    }
-    if (!$wc) {
-        $errores[] = "El campo baños es obligatorio";
-    }
-    if (!$estacionamiento) {
-        $errores[] = "El campo estacionamiento es obligatorio";
-    }
-    if (!$vendedorid) {
-        $errores[] = "El campo vendedor es obligatorio";
-    }
-    if (!$imagen['name'] || $imagen['error']) {
-        $errores[] = "el campo de imagenes no pude estar vacia";
-    }
+
+    // $titulo = $_POST['titulo'];
+    // $descripcion = $_POST['descripcion'];
+    // $creado = date('Y-m-d');
+    // $precio = filter_var($_POST['precio'], FILTER_VALIDATE_INT);
+    // $habitaciones = filter_var($_POST['habitaciones'], FILTER_VALIDATE_INT);
+    // $wc = filter_var($_POST['wc'], FILTER_VALIDATE_INT);
+    // $estacionamiento = filter_var($_POST['estacionamiento'], FILTER_VALIDATE_INT);
+    // $vendedorid = filter_var($_POST['vendedores_id'], FILTER_VALIDATE_INT);
+    // $imagen = $_FILES['imagen'];
+
+
+    // if (!$titulo) {
+    //     $errores[] = "El campo titulo es obligatorio";
+    // }
+    // if (!$precio) {
+    //     $errores[] = "El campo precio es obligatorio";
+    // }
+    // if (!$descripcion || strlen($descripcion) < 50) {
+    //     $errores[] = "El campo descripcion es obligatorio y debe tener al menos 50 caracteres";
+    // }
+    // if (!$habitaciones) {
+    //     $errores[] = "El campo habitaciones es obligatorio";
+    // }
+    // if (!$wc) {
+    //     $errores[] = "El campo baños es obligatorio";
+    // }
+    // if (!$estacionamiento) {
+    //     $errores[] = "El campo estacionamiento es obligatorio";
+    // }
+    // if (!$vendedorid) {
+    //     $errores[] = "El campo vendedor es obligatorio";
+    // }
+    // if (!$imagen['name'] || $imagen['error']) {
+    //     $errores[] = "el campo de imagenes no pude estar vacia";
+    // }
 
     // validamos por tamaño las imagenes(100kb máximo)
-    $medida = 1024 * 1024; // 1 MB
-    if ($imagen['size'] > $medida) {
-        $errores[] = "la imagen es muy pesada";
-    }
+    // $medida = 1024 * 1024; // 1 MB
+    // if ($imagen['size'] > $medida) {
+    //     $errores[] = "la imagen es muy pesada";
+    // }
 
     //revisamos que el array de errores este vacio
     if (empty($errores)) {
+
+        $propiedad->guardar();
 
         /** Subida de archivos **/
 
