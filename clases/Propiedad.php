@@ -106,6 +106,9 @@ class Propiedad
         if (!$this->precio) {
             self::$errores[] = "El campo precio es obligatorio";
         }
+        // if (!$this->imagen) {
+        //     self::$errores[] = "El campo de imagen es obligatorio";
+        // }
         if (!$this->descripcion || strlen($this->descripcion) < 50) {
             self::$errores[] = "El campo descripcion es obligatorio y debe tener al menos 50 caracteres";
         }
@@ -121,18 +124,7 @@ class Propiedad
         if (!$this->vendedorid) {
             self::$errores[] = "El campo vendedor es obligatorio";
         }
-        if (is_array($this->imagen)) {
-            if (!$this->imagen['name'] || $this->imagen['error']) {
-                self::$errores[] = "El campo de imagen no puede estar vacío";
-            }
 
-            $medida = 1024 * 1024; // 1 MB
-            if ($this->imagen['size'] > $medida) {
-                self::$errores[] = "La imagen es muy pesada";
-            }
-        } else {
-            self::$errores[] = "El campo de imagen no puede estar vacío";
-        }
 
         return self::$errores;
     }
