@@ -10,6 +10,10 @@
     <label for="imagen">Imagen:</label>
     <input type="file" id="imagen" name="imagen" accept="image/jpeg, image/png">
 
+    <?php if ($propiedad->imagen): ?>
+        <img src="/imagenes/<?php echo san($propiedad->imagen); ?>" class="imagen-small">
+    <?php endif; ?>
+
     <label for="descripcion">Descripción:</label>
     <textarea id="descripcion" name="descripcion"><?php echo san($propiedad->descripcion); ?></textarea>
 

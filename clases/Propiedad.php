@@ -129,13 +129,23 @@ class Propiedad
         return self::$errores;
     }
 
-    // Listar todas las propiedades
+    // Listar todas los registros
     public static function todas()
     {
         $query = "SELECT * FROM propiedades";
 
         return self::consultarSQL($query);
     }
+
+    // buscar una registro por su id
+    public static function encontrar($id)
+    {
+        $consulta = "SELECT * FROM propiedades WHERE id =" . $id . ";";
+        $resultado = self::consultarSQL($consulta);
+        // return !empty($resultado) ? $resultado[0] : null;
+        return array_shift($resultado);
+    }
+
 
     public static function consultarSQL($query)
     {
