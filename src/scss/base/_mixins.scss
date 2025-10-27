@@ -38,7 +38,7 @@
   border: none;
 
   &:hover {
-    background-color: color.adjust(v.$gris, $lightness: 5%);
+    background-color: color.adjust($bgColor, $lightness: -10%);
     cursor: pointer;
   }
 }
