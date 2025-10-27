@@ -19,10 +19,7 @@
 .boton-verde {
   @include m.boton(v.$verde, inline-block);
   &:hover {
-    background-color: color.adjust(
-      v.$verde,
-      $lightness: -10%
-    ); // lo oscurece un 10%
+    background-color: color.adjust(v.$verde, $lightness: -10%);
   }
 }
 
