@@ -24,21 +24,33 @@ $resultadoVendedores =  mysqli_query($db, $consulta);
 //arreglo con mensajes de error
 $errores = Propiedad::getErrores();
 
-// $titulo = '';
-// $precio = '';
-// $descripcion = '';
-// $habitaciones = '';
-// $wc = '';
-// $estacionamiento = '';
-// $vendedorid = '';
-
 //ejecuta el codigo despues que el usuario envia el furmulario.
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    $propiedad = new Propiedad($_POST);
-    // $propiedad->imagen = $_FILES['imagen'];
-    $imagen = $_FILES['imagen'];
+    // Asignar vendedor_id estático = 1 temporalmente
+    $_POST['propiedad']['vendedores_id'] = 1;
 
+    // debuguear($_POST['propiedad']);
+
+    $propiedad = new Propiedad($_POST['propiedad']);
+
+    // $imagen = $_FILES['imagen'];
+    // Verificar si se subió una imagen
+    if (
+        isset($_FILES['propiedad']['tmp_name']['imagen']) &&
+        $_FILES['propiedad']['error']['imagen'] === UPLOAD_ERR_OK
+    ) {
+        // Reconstruimos el array del archivo (porque viene anidado)
+        $imagen = [
+            'name' => $_FILES['propiedad']['name']['imagen'],
+            'type' => $_FILES['propiedad']['type']['imagen'],
+            'tmp_name' => $_FILES['propiedad']['tmp_name']['imagen'],
+            'error' => $_FILES['propiedad']['error']['imagen'],
+            'size' => $_FILES['propiedad']['size']['imagen']
+        ];
+    } else {
+        $imagen = null;
+    }
     $errores = $propiedad->validar();
 
     if (empty($errores)) {
@@ -51,29 +63,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Generar nombre único para la imagen
         $nombreImagen = md5(uniqid(rand(), true)) . ".jpg";
 
-        // Procesar la imagen con Intervention
-        try {
-            $manager = new Image(new Driver());
+        if ($imagen) {
+            // Procesar la imagen con Intervention
+            try {
+                $manager = new Image(new Driver());
 
-            $img = $manager->read($imagen['tmp_name'])
-                ->resize(800, 600)   // opcional, ajustá tamaño si querés
-                ->toJpeg(85);
+                $img = $manager->read($imagen['tmp_name'])
+                    ->resize(800, 600)
+                    ->toJpeg(85);
 
-            // Guardar la imagen en la carpeta destino
-            $img->save(CARPETA_IMAGENES . $nombreImagen);
+                // Guardar la imagen en la carpeta destino
+                $img->save(CARPETA_IMAGENES . $nombreImagen);
 
-            // Asignar el nombre a la propiedad
-            $propiedad->imagen = $nombreImagen;
+                // Asignar el nombre a la propiedad
+                $propiedad->imagen = $nombreImagen;
 
-            // Guardar en base de datos
-            $resultado = $propiedad->guardar();
+                // Guardar en base de datos
+                $resultado = $propiedad->guardar();
 
-            if ($resultado) {
-                header('Location: /admin?resultado=1');
-                exit;
+                if ($resultado) {
+                    header('Location: /admin?resultado=1');
+                    exit;
+                }
+            } catch (Exception $e) {
+                $errores[] = "Error al procesar la imagen: " . $e->getMessage();
             }
-        } catch (Exception $e) {
-            $errores[] = "Error al procesar la imagen: " . $e->getMessage();
         }
     }
 }

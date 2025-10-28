@@ -28,15 +28,12 @@ $errores = [];
 //ejecuta el codigo despues que el usuario envia el furmulario.
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
+    debuguear($_POST);
+    $args = $_POST['propiedad'];
 
-    $titulo = $_POST['titulo'];
-    $descripcion = $_POST['descripcion'];
-    $creado = date('Y-m-d');
-    $precio = filter_var($_POST['precio'], FILTER_VALIDATE_FLOAT);
-    $habitaciones = filter_var($_POST['habitaciones'], FILTER_VALIDATE_INT);
-    $wc = filter_var($_POST['wc'], FILTER_VALIDATE_INT);
-    $estacionamiento = filter_var($_POST['estacionamiento'], FILTER_VALIDATE_INT);
-    $vendedorid = filter_var($_POST['vendedorid'], FILTER_VALIDATE_INT);
+    $propiedad->sincronizar($args);
+
+    debuguear($propiedad);
 
     $imagen = $_FILES['imagen'];
 
