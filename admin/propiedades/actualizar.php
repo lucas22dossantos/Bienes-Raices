@@ -1,6 +1,8 @@
 <?php
 
 use App\Propiedad;
+use Intervention\Image\ImageManager as Image;
+use Intervention\Image\Drivers\Gd\Driver;
 
 require '../../includes/app.php';
 
@@ -23,109 +25,43 @@ $consulta = "SELECT * FROM vendedores;";
 $resultadoVendedores =  mysqli_query($db, $consulta);
 
 //arreglo con mensajes de error
-$errores = [];
+$errores = Propiedad::getErrores();
 
 //ejecuta el codigo despues que el usuario envia el furmulario.
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    debuguear($_POST);
+    // debuguear($_POST);
     $args = $_POST['propiedad'];
 
     $propiedad->sincronizar($args);
 
-    debuguear($propiedad);
+    // validacion
+    $errores = $propiedad->validar();
 
-    $imagen = $_FILES['imagen'];
-
-    if (!$titulo) {
-        $errores[] = "El campo titulo es obligatorio";
-    }
-
-    if (!$precio) {
-        $errores[] = "El campo precio es obligatorio";
-    }
-
-    if (!$descripcion || strlen($descripcion) < 50) {
-        $errores[] = "El campo descripcion es obligatorio y debe tener al menos 50 caracteres";
-    }
-    if (!$habitaciones) {
-        $errores[] = "El campo habitaciones es obligatorio";
-    }
-    if (!$wc) {
-        $errores[] = "El campo baños es obligatorio";
-    }
-    if (!$estacionamiento) {
-        $errores[] = "El campo estacionamiento es obligatorio";
-    }
-    if (!$vendedorid) {
-        $errores[] = "El campo vendedor es obligatorio";
-    }
-
-    // validamos por tamaño las imagenes(100kb máximo)
-    $medida = 1024 * 1024; // 1 MB
-    if ($imagen['size'] > $medida) {
-        $errores[] = "la imagen es muy pesada";
-    }
+    // Generar nombre único para la imagen
+    $nombreImagen = md5(uniqid(rand(), true)) . ".jpg";
 
     //revisamos que el array de errores este vacio
     if (empty($errores)) {
 
-        /** Subida de archivos **/
+        // Procesar imagen si hay una nueva
+        if ($imagen) {
+            $nombreImagen = md5(uniqid(rand(), true)) . ".jpg";
 
-        // creamos carpetas
-        $carpetaImagenes = "../../imagenes/";
-        if (!is_dir($carpetaImagenes)) { //pregunta si no existe la carpeta ingresara y creara la carpeta.
-            mkdir($carpetaImagenes);
+            $manager = new Image(new Driver());
+            $img = $manager->read($imagen['tmp_name'])
+                ->resize(800, 600)
+                ->toJpeg(85);
+
+            $img->save(CARPETA_IMAGENES . $nombreImagen);
+
+            $propiedad->imagen = $nombreImagen;
         }
 
-        if ($imagen['name']) {
+        // Guardar cambios (actualiza o crea según corresponda)
+        $resultado = $propiedad->guardar();
 
-            // Eliminar la imagen anterior si existe
-            $rutaImagenAnterior = $carpetaImagenes . $imagenProp;
-
-            // file_exists() Verifica si el archivo realmente existe en esa ruta. true o false
-            if (file_exists($rutaImagenAnterior)) {
-                unlink($rutaImagenAnterior); // unlink() Borra el archivo de manera definitiva del disco (del servidor).
-            }
-
-            //generar un nombre unico
-            $nombreImagenes = md5(uniqid(rand(rand(), true))) . '.jpg';
-        } else {
-            $nombreImagenes = $imagenProp; // mantener la imagen anterior
-        }
-
-        // Subir la imagen
-        move_uploaded_file($imagen['tmp_name'], $carpetaImagenes . $nombreImagenes);
-
-        // //actualizamos
-        $stmt = $db->prepare("UPDATE propiedades  SET 
-                titulo = ?, 
-                precio = ?, 
-                imagen = ?, 
-                descripcion = ?, 
-                habitaciones = ?, 
-                wc = ?, 
-                estacionamiento = ?, 
-                creado = ?, 
-                vendedores_id = ? 
-                WHERE id = ?");
-        $stmt->bind_param(
-            "sissiiisii",
-            $titulo,
-            $precio,
-            $nombreImagenes,
-            $descripcion,
-            $habitaciones,
-            $wc,
-            $estacionamiento,
-            $creado,
-            $vendedorid,
-            $id
-        );
-        $stmt->execute();
-
-        if ($stmt->affected_rows > 0) {
-            //rediccionar al usuario
+        if ($resultado) {
             header('Location: /admin?resultado=2');
             exit;
         }

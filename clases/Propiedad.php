@@ -42,8 +42,20 @@ class Propiedad
         $this->vendedorid = $args['vendedores_id'] ?? '';
     }
 
-    // Método guardar
+    // metodo guardar para actualizar o crear registros
     public function guardar()
+    {
+        if (isset($this->id)) {
+            //actualizamos
+            $this->actualizar();
+        } else {
+            //creamos un nuevo registro
+            $this->crear();
+        }
+    }
+
+    // Método crear para insertar un nuevo registro en la base de datos
+    public function crear()
     {
 
         //sanitizar los datos
@@ -71,6 +83,47 @@ class Propiedad
         return $stmt->affected_rows > 0;
     }
 
+    public function actualizar()
+    {
+        // Sanitizar los datos
+        $atributos = $this->sanitizarDatos();
+
+        // Preparar la consulta SQL
+        $stmt = self::$db->prepare("UPDATE propiedades SET 
+        titulo = ?, 
+        precio = ?, 
+        imagen = ?, 
+        descripcion = ?, 
+        habitaciones = ?, 
+        wc = ?, 
+        estacionamiento = ?, 
+        creado = ?, 
+        vendedores_id = ? 
+        WHERE id = ? 
+        LIMIT 1");
+
+        // Enlazar los parámetros
+        $stmt->bind_param(
+            "sissiiisii",
+            $this->titulo,
+            $this->precio,
+            $this->imagen,
+            $this->descripcion,
+            $this->habitaciones,
+            $this->wc,
+            $this->estacionamiento,
+            $this->creado,
+            $this->vendedorid,
+            $this->id
+        );
+
+        // Ejecutar la consulta
+        $stmt->execute();
+
+        // Retornar true si se actualizó al menos una fila
+        return $stmt->affected_rows > 0;
+    }
+
     public function atributos()
     {
         $atributos = [];
@@ -91,6 +144,23 @@ class Propiedad
         return $sanitizado;
     }
 
+    // subida de archivo
+    public function setImagen($imagen)
+    {
+        // Elimina la imagen previa
+        if (isset($this->id)) {
+            $existeArchivo = file_exists(CARPETA_IMAGENES . $this->imagen);
+            if ($existeArchivo) {
+                unlink(CARPETA_IMAGENES . $this->imagen);
+            }
+        }
+
+        // Asignar el nombre de la imagen al atributo
+        if ($imagen) {
+            $this->imagen = $imagen;
+        }
+    }
+
     // validacion
     public static function getErrores()
     {
@@ -106,9 +176,9 @@ class Propiedad
         if (!$this->precio) {
             self::$errores[] = "El campo precio es obligatorio";
         }
-        // if (!$this->imagen) {
-        //     self::$errores[] = "El campo de imagen es obligatorio";
-        // }
+        if (!$this->imagen) {
+            self::$errores[] = "El campo de imagen es obligatorio";
+        }
         if (!$this->descripcion || strlen($this->descripcion) < 50) {
             self::$errores[] = "El campo descripcion es obligatorio y debe tener al menos 50 caracteres";
         }
