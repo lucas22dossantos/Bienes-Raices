@@ -30,17 +30,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Asignar vendedor_id estático = 1 temporalmente
     $_POST['propiedad']['vendedores_id'] = 1;
 
-    // debuguear($_POST['propiedad']);
-
     $propiedad = new Propiedad($_POST['propiedad']);
 
-    // $imagen = $_FILES['imagen'];
     // Verificar si se subió una imagen
     if (
         isset($_FILES['propiedad']['tmp_name']['imagen']) &&
         $_FILES['propiedad']['error']['imagen'] === UPLOAD_ERR_OK
     ) {
-        // Reconstruimos el array del archivo (porque viene anidado)
         $imagen = [
             'name' => $_FILES['propiedad']['name']['imagen'],
             'type' => $_FILES['propiedad']['type']['imagen'],
@@ -48,10 +44,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'error' => $_FILES['propiedad']['error']['imagen'],
             'size' => $_FILES['propiedad']['size']['imagen']
         ];
+
+        $nombreImagen = md5(uniqid(rand(), true)) . ".jpg";
+        $propiedad->imagen = $nombreImagen;
     } else {
         $imagen = null;
     }
 
+
+    // validar
     $errores = $propiedad->validar();
 
     if (empty($errores)) {
@@ -60,9 +61,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!is_dir(CARPETA_IMAGENES)) {
             mkdir(CARPETA_IMAGENES, 0777, true);
         }
-
-        // Generar nombre único para la imagen
-        $nombreImagen = md5(uniqid(rand(), true)) . ".jpg";
 
         if ($imagen) {
             // Procesar la imagen con Intervention
@@ -80,12 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $propiedad->imagen = $nombreImagen;
 
                 // Guardar en base de datos
-                $resultado = $propiedad->guardar();
-
-                if ($resultado) {
-                    header('Location: /admin?resultado=1');
-                    exit;
-                }
+                $propiedad->guardar();
             } catch (Exception $e) {
                 $errores[] = "Error al procesar la imagen: " . $e->getMessage();
             }

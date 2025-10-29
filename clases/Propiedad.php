@@ -31,6 +31,7 @@ class Propiedad
 
     public function __construct($args = [])
     {
+        $this->id = $args['id'] ?? null;
         $this->titulo = $args['titulo'] ?? '';
         $this->precio = $args['precio'] ?? '';
         $this->imagen = $args['imagen'] ?? '';
@@ -45,7 +46,7 @@ class Propiedad
     // metodo guardar para actualizar o crear registros
     public function guardar()
     {
-        if (isset($this->id)) {
+        if (!is_null($this->id)) {
             //actualizamos
             $this->actualizar();
         } else {
@@ -80,7 +81,12 @@ class Propiedad
 
         $stmt->execute();
 
-        return $stmt->affected_rows > 0;
+        if ($stmt->affected_rows > 0) {
+            header('Location: /admin?resultado=1');
+            exit;
+        }
+
+        // return $stmt->affected_rows > 0;
     }
 
     public function actualizar()
@@ -160,7 +166,7 @@ class Propiedad
     public function setImagen($imagen)
     {
         // Elimina la imagen previa
-        if (isset($this->id)) {
+        if (!is_null($this->id)) {
             $this->borrarImagen();
         }
 
@@ -194,7 +200,8 @@ class Propiedad
         if (!$this->precio) {
             self::$errores[] = "El campo precio es obligatorio";
         }
-        if (!$this->imagen) {
+        // Validar imagen solo cuando se crea una nueva propiedad
+        if (!$this->id && !$this->imagen) {
             self::$errores[] = "El campo de imagen es obligatorio";
         }
         if (!$this->descripcion || strlen($this->descripcion) < 50) {
