@@ -1,9 +1,9 @@
 <?php
-require '../clases/Propiedad.php';
+// require '../clases/Propiedad.php';
+require '../includes/app.php';
 
 use App\Propiedad;
 
-require '../includes/funciones.php';
 $auth = estaAutenticada();
 
 if (!$auth) {
@@ -11,8 +11,7 @@ if (!$auth) {
     exit;
 }
 
-// importar la conexion
-require '../includes/config/database.php';
+// Conexión a la base de datos
 $db = conectarBD();
 
 Propiedad::setDB($db);
@@ -31,21 +30,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $propiedad = Propiedad::encontrar($id);
         $propiedad->eliminar();
-
-        //Eliminar el archivo
-        // $query = 'SELECT imagen FROM propiedades WHERE id =' . $id;
-
-        // $resultado = mysqli_query($db, $query);
-        // $propiedades = mysqli_fetch_assoc($resultado);
-
-        // unlink('../imagenes/' . $propiedades['imagen']);
-
-
-
-        // $resultado = mysqli_query($db, $query);
-        // if ($resultado) {
-        //     header('Location: /admin?resultado=3');
-        // }
     }
 }
 
