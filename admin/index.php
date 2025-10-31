@@ -3,6 +3,7 @@
 require '../includes/app.php';
 
 use App\Propiedad;
+use App\Vendedor;
 
 $auth = estaAutenticada();
 
@@ -18,6 +19,7 @@ Propiedad::setDB($db);
 // Implementar un método para obtener todas las propiedades
 
 $propiedades = Propiedad::todas();
+$vendedores = Vendedor::todas();
 
 // mensaje condicional
 $resultado = $_GET['resultado'] ?? null;

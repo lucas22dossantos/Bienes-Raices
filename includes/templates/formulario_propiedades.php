@@ -35,6 +35,15 @@
 
 <fieldset>
     <legend>Vendedor</legend>
-    <input type="text" id="vendedor" name="propiedad[vendedor]" placeholder="Nombre del vendedor" value="1">
+    <label for="vendedor">Seleccione un vendedor:</label>
+    <select name="propiedad[vendedores_id]" id="vendedor">
+        <option value="" selected>--Seleccione--</option>
+        <?php foreach ($vendedores as $vendedor): ?>
+
+            <option
+                <?php echo $propiedad->vendedorid == $vendedor->id ? 'selected' : ''; ?>
+                value="<?php echo san($vendedor->id); ?>"><?php echo san($vendedor->nombre) . " " . san($vendedor->apellido); ?></option>
+        <?php endforeach; ?>
+    </select>
 
 </fieldset>

@@ -1,15 +1,7 @@
 <?php
 
 /**
- * Clase base ActiveRecord
- *
- * Este bloque de anotaciones PHPDoc describe las propiedades
- * comunes que manejan las clases hijas (como Propiedad) al 
- * interactuar con la base de datos.
- *
- * No es código ejecutable: solo sirve para que los editores y 
- * analizadores estáticos (como Intelephense) reconozcan las 
- * propiedades y eviten mostrar advertencias falsas.
+ *Esto es para que reconozcan las propiedades y eviten mostrar advertencias falsas.
  * 
  * @property int|null $id
  * @property string $titulo
@@ -22,7 +14,6 @@
  * @property string $creado
  * @property int $vendedorid
  */
-
 
 namespace App;
 
@@ -125,8 +116,10 @@ class ActiveRecord
         // Ejecutar la consulta
         $stmt->execute();
 
-        // Retornar true si se actualizó al menos una fila
-        return $stmt->affected_rows > 0;
+        if ($stmt->affected_rows > 0) {
+            header('Location: /admin?resultado=2');
+            exit;
+        }
     }
 
     public function eliminar()
@@ -144,7 +137,7 @@ class ActiveRecord
     public function atributos()
     {
         $atributos = [];
-        foreach (self::$columnasDB as $columna) {
+        foreach (static::$columnasDB as $columna) {
             if ($columna === 'id') continue;
             $atributos[$columna] = $this->$columna;
         }
@@ -187,40 +180,14 @@ class ActiveRecord
     // validacion
     public static function getErrores()
     {
-        return self::$errores;
+        return static::$errores;
     }
 
 
     public function validar()
     {
-        if (!$this->titulo) {
-            self::$errores[] = "El campo titulo es obligatorio";
-        }
-        if (!$this->precio) {
-            self::$errores[] = "El campo precio es obligatorio";
-        }
-        // Validar imagen solo cuando se crea una nueva propiedad
-        if (!$this->id && !$this->imagen) {
-            self::$errores[] = "El campo de imagen es obligatorio";
-        }
-        if (!$this->descripcion || strlen($this->descripcion) < 50) {
-            self::$errores[] = "El campo descripcion es obligatorio y debe tener al menos 50 caracteres";
-        }
-        if (!$this->habitaciones) {
-            self::$errores[] = "El campo habitaciones es obligatorio";
-        }
-        if (!$this->wc) {
-            self::$errores[] = "El campo baños es obligatorio";
-        }
-        if (!$this->estacionamiento) {
-            self::$errores[] = "El campo estacionamiento es obligatorio";
-        }
-        if (!$this->vendedorid) {
-            self::$errores[] = "El campo vendedor es obligatorio";
-        }
-
-
-        return self::$errores;
+        static::$errores = [];
+        return static::$errores;
     }
 
     // Listar todas los registros
@@ -249,7 +216,7 @@ class ActiveRecord
         // Iterar los resultados
         $array = [];
         while ($registro = $resultado->fetch_assoc()) {
-            $array[] = self::crearObjeto($registro);
+            $array[] = static::crearObjeto($registro);
         }
 
         //Liberar la memoria
@@ -261,13 +228,20 @@ class ActiveRecord
 
     protected static function crearObjeto($registro)
     {
+
         $objeto = new static;
 
         foreach ($registro as $key => $value) {
+
+            if ($key === 'vendedores_id') {
+                $objeto->vendedorid = $value;
+                continue;
+            }
             if (property_exists($objeto, $key)) {
                 $objeto->$key = $value;
             }
         }
+
         return $objeto;
     }
 

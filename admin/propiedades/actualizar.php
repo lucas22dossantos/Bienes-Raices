@@ -1,10 +1,12 @@
 <?php
+require '../../includes/app.php';
 
 use App\Propiedad;
+use App\Vendedor;
+
 use Intervention\Image\ImageManager as Image;
 use Intervention\Image\Drivers\Gd\Driver;
 
-require '../../includes/app.php';
 
 // funcion de autenticacion
 estaAutenticada();
@@ -21,8 +23,7 @@ incluirTemplates('header', false);
 $propiedad = Propiedad::encontrar($id);
 
 //consulta para obtener a todos los vendedores
-$consulta = "SELECT * FROM vendedores;";
-$resultadoVendedores =  mysqli_query($db, $consulta);
+$vendedores = Vendedor::todas();
 
 //arreglo con mensajes de error
 $errores = Propiedad::getErrores();
@@ -34,6 +35,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $args = $_POST['propiedad'];
 
     $propiedad->sincronizar($args);
+    // Asegurarse que la propiedad correcta tenga el valor del select
+    if (isset($args['vendedores_id'])) {
+        $propiedad->vendedorid = $args['vendedores_id'];
+    }
 
     // validacion
     $errores = $propiedad->validar();
@@ -44,8 +49,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     //revisamos que el array de errores este vacio
     if (empty($errores)) {
 
+        $imagen = $_FILES['propiedad']['imagen'] ?? null;
+
         // Procesar imagen si hay una nueva
-        if ($imagen) {
+        if ($imagen && $imagen['tmp_name']) {
             $nombreImagen = md5(uniqid(rand(), true)) . ".jpg";
 
             $manager = new Image(new Driver());
@@ -58,13 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $propiedad->imagen = $nombreImagen;
         }
 
-        // Guardar cambios (actualiza o crea según corresponda)
-        $resultado = $propiedad->guardar();
-
-        if ($resultado) {
-            header('Location: /admin?resultado=2');
-            exit;
-        }
+        $propiedad->guardar();
     }
 }
 

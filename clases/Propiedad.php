@@ -31,4 +31,35 @@ class Propiedad extends ActiveRecord
         $this->creado = date('y/m/d');
         $this->vendedorid = $args['vendedores_id'] ?? '';
     }
+
+    public function validar()
+    {
+        if (!$this->titulo) {
+            self::$errores[] = "El campo titulo es obligatorio";
+        }
+        if (!$this->precio) {
+            self::$errores[] = "El campo precio es obligatorio";
+        }
+        // Validar imagen solo cuando se crea una nueva propiedad
+        if (!$this->id && !$this->imagen) {
+            self::$errores[] = "El campo de imagen es obligatorio";
+        }
+        if (!$this->descripcion || strlen($this->descripcion) < 50) {
+            self::$errores[] = "El campo descripcion es obligatorio y debe tener al menos 50 caracteres";
+        }
+        if (!$this->habitaciones) {
+            self::$errores[] = "El campo habitaciones es obligatorio";
+        }
+        if (!$this->wc) {
+            self::$errores[] = "El campo baños es obligatorio";
+        }
+        if (!$this->estacionamiento) {
+            self::$errores[] = "El campo estacionamiento es obligatorio";
+        }
+        if (!$this->vendedorid) {
+            self::$errores[] = "El campo vendedor es obligatorio";
+        }
+
+        return static::$errores;
+    }
 }

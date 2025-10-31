@@ -2,6 +2,8 @@
 require '../../includes/app.php';
 
 use App\Propiedad;
+use App\Vendedor;
+
 use Intervention\Image\ImageManager as Image;
 use Intervention\Image\Drivers\Gd\Driver;
 
@@ -10,16 +12,12 @@ $auth = estaAutenticada();
 // funcion de autenticacion
 estaAutenticada();
 
-//base de datos
-$db = conectarBD();
-
 $propiedad = new Propiedad;
 
 incluirTemplates('header', false);
 
-//consulta para obtener a todos los vendedores
-$consulta = "SELECT * FROM vendedores;";
-$resultadoVendedores =  mysqli_query($db, $consulta);
+//consulta para obtener todos los vendedores
+$vendedores = Vendedor::todas();
 
 //arreglo con mensajes de error
 $errores = Propiedad::getErrores();
@@ -27,9 +25,7 @@ $errores = Propiedad::getErrores();
 //ejecuta el codigo despues que el usuario envia el furmulario.
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    // Asignar vendedor_id estático = 1 temporalmente
-    $_POST['propiedad']['vendedores_id'] = 1;
-
+    // crear una nueva instancia
     $propiedad = new Propiedad($_POST['propiedad']);
 
     // Verificar si se subió una imagen
