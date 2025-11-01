@@ -1,5 +1,5 @@
 <?php
-// require '../clases/Propiedad.php';
+
 require '../includes/app.php';
 
 use App\Propiedad;
@@ -16,6 +16,7 @@ if (!$auth) {
 $db = conectarBD();
 
 Propiedad::setDB($db);
+Vendedor::setDB($db);
 // Implementar un método para obtener todas las propiedades
 
 $propiedades = Propiedad::todas();
@@ -25,13 +26,26 @@ $vendedores = Vendedor::todas();
 $resultado = $_GET['resultado'] ?? null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+
     $id = $_POST['id'];
     $id = filter_var($id, FILTER_VALIDATE_INT);
 
     if ($id) {
 
-        $propiedad = Propiedad::encontrar($id);
-        $propiedad->eliminar();
+        $tipo = $_POST['tipo'];
+
+        if (validarTipoContenido($tipo)) {
+
+            // compara lo que vamos a eliminar
+            if ($tipo === 'vendedor') {
+                $vendedor = Vendedor::encontrar($id);
+                $vendedor->eliminar();
+            } else if ($tipo === 'propiedad') {
+                $propiedad = Propiedad::encontrar($id);
+                $propiedad->eliminar();
+            }
+        }
     }
 }
 
@@ -51,7 +65,10 @@ incluirTemplates('header', false);
     <?php endif ?>
 
     <a href="/admin/propiedades/crear.php" class="boton boton-verde">Nueva Propiedad</a>
+    <a href="/admin/vendedores/crear.php" class="boton boton-amarillo">Nuevo(a) Vendedor</a>
 
+
+    <h2>Propiedades</h2>
     <table class="propiedades">
         <thead>
             <tr>
@@ -72,6 +89,7 @@ incluirTemplates('header', false);
                     <td>
                         <form method="POST" class="w-100">
                             <input type="hidden" name="id" value="<?php echo $propiedad->id; ?>">
+                            <input type="hidden" name="tipo" value="propiedad">
                             <input type="submit" value="Eliminar" class="boton-rojo-block">
                         </form>
                         <a href="/admin/propiedades/actualizar.php?id=<?php echo $propiedad->id; ?>"
@@ -84,12 +102,45 @@ incluirTemplates('header', false);
 
 
 
+    <!--------------------------------------------------- Vendedores ------------------------------------------------------>
+
+    <h2>Vendedores</h2>
+    <table class="propiedades">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Telefono</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody> <!--mostrar los resultados de la consulta -->
+            <?php
+            /**
+             * @var array|\App\Vendedor[] $vendedores
+             */
+            ?>
+            <?php foreach ($vendedores as $vendedor): ?>
+                <tr>
+                    <td><?php echo $vendedor->id; ?></td>
+                    <td><?php echo $vendedor->nombre . " " . $vendedor->apellido; ?></td>
+                    <td><?php echo $vendedor->telefono; ?></td>
+                    <td>
+                        <form method="POST" class="w-100">
+                            <input type="hidden" name="id" value="<?php echo $vendedor->id; ?>">
+                            <input type="hidden" name="tipo" value="vendedor">
+                            <input type="submit" value="Eliminar" class="boton-rojo-block">
+                        </form>
+                        <a href="/admin/vendedores/actualizar.php?id=<?php echo $vendedor->id; ?>"
+                            class="boton-amarillo-block">actualizar</a>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+
 </main>
 
 <?php
-
-//cerrar la conexion a la db.
-mysqli_close($db);
-
 incluirTemplates('footer', false);
 ?>

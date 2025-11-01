@@ -3,7 +3,7 @@
 @use "variables" as v;
 
 .boton-amarillo {
-  @include m.boton(v.$amarillo, block);
+  @include m.boton(v.$amarillo, inline-block);
   &:hover {
     background-color: #b86b07; // amarillo más oscuro a mano
   }
